@@ -1,55 +1,63 @@
 package ladder;
 
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LadderTest {
 
     @Test
-    @DisplayName("선이 그어져 있지 않으면 그대로 반환한다.")
+    @DisplayName("선이 없는 경우 그대로 반환할 수 있다.")
     void testClimbWhenNoLine() {
-        Ladder ladder = new Ladder(2);
-        assertEquals(1, ladder.climb(1));
+        Ladder ladder = new Ladder(1, 3);
+
+        assertEquals(0, ladder.climb(0));
         assertEquals(2, ladder.climb(2));
     }
 
     @Test
-    @DisplayName("높이가 1, 참여자가 2명일 때 선이 그어져 있는 경우")
-    void testClimbWhenTwoByOne_Line() {
-        Ladder ladder = new Ladder(2);
-        ladder.drawLine(0);
-        assertEquals(2, ladder.climb(1));
+    @DisplayName("선이 1개가 좌측으로 그어져 있는 경우")
+    void testClimbWhenLineLeft() {
+        // 0 1 1
+        Ladder ladder = new Ladder(1, 3);
+        ladder.drawLine(0, 1);
         assertEquals(1, ladder.climb(2));
+
+        // 1 1 0
+        ladder = new Ladder(1, 3);
+        ladder.drawLine(0, 0);
+        assertEquals(0, ladder.climb(1));
     }
 
-    @ParameterizedTest
-    @MethodSource("generatePositions")
-    @DisplayName("높이가 1, 참여자가 3명일 때 선이 그어져 있는 경우")
-    void testClimbWhenThreeByOne_Line(
-        final int startPosition,
-        final List<Integer> positions
-    ) {
-        Ladder ladder = new Ladder(3);
-        ladder.drawLine(startPosition);
+    @Test
+    @DisplayName("선이 1개가 우측으로 그어져 있는 경우")
+    void testClimbWhenLineRight() {
+        // 0 1 1
+        Ladder ladder = new Ladder(1, 3);
+        ladder.drawLine(0, 1);
+        assertEquals(2, ladder.climb(1));
 
-        for (int i = 0; i < positions.size(); i++) {
-            assertEquals(positions.get(i), ladder.climb(i + 1));
-        }
+        // 1 1 0
+        ladder = new Ladder(1, 3);
+        ladder.drawLine(0, 0);
+        assertEquals(1, ladder.climb(0));
     }
 
-    public static Stream<Arguments> generatePositions() {
-        return Stream.of(
-            Arguments.of(0, List.of(2, 1, 3)),
-            Arguments.of(1, List.of(1, 3, 2))
-        );
+    @Test
+    void testClimbWhenMultiRows() {
+        // 1 1 0 0
+        // 0 1 1 0
+        // 0 0 1 1
+        Ladder ladder = new Ladder(3, 4);
+
+        ladder.drawLine(0, 0);
+        ladder.drawLine(1, 1);
+        ladder.drawLine(2, 2);
+
+        assertEquals(3, ladder.climb(0));
+        assertEquals(0, ladder.climb(1));
+        assertEquals(1, ladder.climb(2));
+        assertEquals(2, ladder.climb(3));
     }
 }
