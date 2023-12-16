@@ -1,35 +1,39 @@
 package ladder;
 
-public class Ladder {
+class Ladder {
 
-    private final int[][] rows;
+    private final Row[] rows;
 
-    public Ladder(
-        final int countOfRow,
-        final int numberOfPerson
-    ) {
-        this.rows = new int[countOfRow][numberOfPerson];
+    Ladder(final NaturalNumber height, final NaturalNumber numberOfPerson) {
+        this.rows = new Row[height.getNumber()];
+
+        for (int i = 0; i < height.getNumber(); i++) {
+            rows[i] = new Row(numberOfPerson);
+        }
     }
 
-    public void drawLine(final int numberOfRow, final int startPosition) {
-        rows[numberOfRow][startPosition] = 1;
-        rows[numberOfRow][startPosition + 1] = 1;
+    void drawLine(final NaturalNumber height, final NaturalNumber startPosition) {
+        if (height.toArrayIndex() >= rows.length) {
+            throw new IllegalArgumentException("유효하지 않은 높이입니다.");
+        }
+        rows[height.toArrayIndex()].drawLine(startPosition);
     }
 
-    public int climb(int numberOfPerson) {
-        for (final int[] row : rows) {
-            numberOfPerson = climbRow(numberOfPerson, row);
+    int move(final NaturalNumber numberOfPerson) {
+        int dest = numberOfPerson.getNumber();
+        for (final Row row : rows) {
+            dest = row.move(NaturalNumber.of(dest));
         }
-        return numberOfPerson;
+        return dest;
     }
 
-    private int climbRow(int numberOfPerson, int[] row) {
-        if (row[numberOfPerson] == 0) {
-            return numberOfPerson;
+    String map() {
+        final StringBuilder sb = new StringBuilder();
+
+        for (final Row row : rows) {
+            sb.append(row.map());
+            sb.append(System.lineSeparator());
         }
-        if (numberOfPerson - 1 >= 0 && row[numberOfPerson - 1] == 1) {
-            return numberOfPerson - 1;
-        }
-        return numberOfPerson + 1;
+        return sb.toString();
     }
 }
